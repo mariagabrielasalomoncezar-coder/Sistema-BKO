@@ -1,0 +1,58 @@
+VIVA CONECTA • SISTEMA DE ALIMENTAÇÃO BKO • V1
+
+O QUE ESTA VERSÃO JÁ FAZ
+- Login usando os usuários do mesmo Supabase do Dashboard.
+- Cadastro e edição de pedidos.
+- Busca automática de cliente pela base interna usando CNPJ.
+- Razão Social e Gestor preenchidos quando o CNPJ já existe.
+- Consultor e Equipe lidos diretamente do Dashboard atual.
+- Regras configuráveis de Modalidade -> Vencimento.
+- Cálculo Quantidade x Valor Unitário.
+- Status do pedido separado do status de entrega.
+- O pedido NÃO entra no Dashboard enquanto estiver em análise/andamento.
+- Quando o status vira APROVADO, o sistema cria automaticamente o lançamento no Dashboard.
+- Proteção contra envio repetido do mesmo pedido.
+- Se um pedido já aprovado for editado, o lançamento correspondente no Dashboard também é corrigido.
+- Dashboard original continua disponível para lançamentos/edições manuais.
+
+IMPORTANTE
+Esta V1 usa o mesmo Supabase do Dashboard Viva Conecta e não zera nem altera metas automaticamente.
+Como outubro será iniciado zerado, primeiro use no Dashboard atual a função de iniciar novo período/zerar realizados no momento certo.
+
+INSTALAÇÃO
+1) Entre no Supabase usado pelo Dashboard.
+2) Abra SQL Editor.
+3) Cole TODO o conteúdo de BKO-SETUP.sql e execute.
+4) Garanta que os usuários do BKO existam em Authentication > Users.
+5) Suba esta pasta em um NOVO repositório GitHub (recomendado) ou novo projeto Vercel.
+6) Importe o projeto na Vercel.
+7) Abra o endereço gerado e faça login com um usuário do Supabase.
+
+NÃO SUBSTITUA O REPOSITÓRIO DO DASHBOARD COM ESTA PASTA.
+O Sistema BKO deve ficar como um projeto separado, conectado ao mesmo Supabase.
+
+FLUXO
+Pedido criado -> fica no BKO.
+Pedido em análise/andamento -> continua só no BKO.
+Pedido reprovado/cancelado -> não entra no Dashboard.
+Pedido APROVADO -> entra automaticamente no Dashboard.
+
+PRÓXIMAS ETAPAS SUGERIDAS
+- Perfis específicos: BKO, Supervisor e Admin.
+- Histórico de alterações por pedido.
+- Importação da base completa de clientes.
+- Integração direta com planilha Excel/SharePoint se necessária.
+- Automatizar mapeamento Modalidade/Subproduto -> Produto do Dashboard.
+- Visão detalhada de SLA e pedidos parados.
+
+V1.2: linha inteira do pedido abre para edição e campo Gestor removido das telas.
+
+
+NOVO NA V1.3
+- Menu Relatórios.
+- Visão geral da operação com pedidos, clientes, andamento, aprovados, quantidade e valor.
+- Filtros por período, consultor, equipe, status e produto.
+- Resumo por consultor e por produto.
+- Relatório detalhado por cliente/pedido.
+- Exportação compatível com Excel (.xls) diretamente pelo navegador.
+- Não exige novo SQL: usa as tabelas já criadas na V1.
