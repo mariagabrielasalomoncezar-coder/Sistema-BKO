@@ -82,3 +82,6 @@ NOVO NA V1.3
 - Relatório detalhado por cliente/pedido.
 - Exportação compatível com Excel (.xls) diretamente pelo navegador.
 - Não exige novo SQL: usa as tabelas já criadas na V1.
+
+
+V1.6: adicionado Modo TV do Dashboard BKO, com visual executivo, indicadores por status, ranking por consultor, pedidos em acompanhamento e atualização automática a cada 30 segundos. Não requer SQL adicional.
