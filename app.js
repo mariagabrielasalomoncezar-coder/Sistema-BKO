@@ -2,7 +2,10 @@ const CONFIG=window.VIVA_CONFIG||{};
 const SB=CONFIG.supabaseUrl||''; const KEY=CONFIG.supabaseAnonKey||'';
 const AUTH='vivaBkoAuthV1';
 let session=null, dashboardState=null, orders=[], clients=[], rules=[];
-let currentView='dashboard', tvTimer=null;
+let currentView='dashboard', tvTimer=null, tvZoom=1;
+function applyTvZoom(){const el=document.querySelector('.tv-shell');if(el)el.style.zoom=String(tvZoom);const lbl=document.getElementById('tvZoomLabel');if(lbl)lbl.textContent=Math.round(tvZoom*100)+'%'}
+function changeTvZoom(delta){tvZoom=Math.max(.7,Math.min(1.4,Math.round((tvZoom+delta)*10)/10));applyTvZoom()}
+function resetTvZoom(){tvZoom=1;applyTvZoom()}
 const STATUSES=['ANÁLISE BKO','ANÁLISE DE CRÉDITO','ANÁLISE DE FRAUDE','AGUARDANDO INFORMAÇÃO','EM ANDAMENTO','APROVADO','REPROVADO CRÉDITO','REPROVADO FRAUDE','CANCELADO'];
 const DELIVERY=['','AG. INSTALAÇÃO','AG. ENTREGA','LOGÍSTICA CONCLUÍDA','CONCLUÍDO','CANCELADO'];
 const app=document.getElementById('app');
@@ -37,7 +40,7 @@ function statusCounts(list){
   return c;
 }
 function renderDashboardBko(){
-  const c=statusCounts(orders), totalValue=orders.reduce((a,o)=>a+Number(o.valor_contrato||0),0), uniqueClients=new Set(orders.map(o=>cleanCnpj(o.cnpj)).filter(Boolean)).size;
+  const c=statusCounts(orders), uniqueClients=new Set(orders.map(o=>cleanCnpj(o.cnpj)).filter(Boolean)).size;
   const sellers=groupSummary(orders,o=>o.consultor).slice(0,8);
   const recent=orders.slice(0,8);
   app.innerHTML=shell(`<div class="section-title dashboard-title"><div><h2>Dashboard BKO</h2><p>Visão operacional de todos os pedidos, inclusive os que ainda não foram aprovados.</p></div><div class="dashboard-actions"><button class="btn" onclick="go('tv')">Abrir modo TV</button><button class="btn primary" onclick="go('novo')">+ Novo pedido</button></div></div>
@@ -51,21 +54,20 @@ function renderDashboardBko(){
     <div class="card status-card ok"><small>Aprovados</small><strong>${c.aprovado}</strong></div>
     <div class="card status-card bad"><small>Reprovados / Cancelados</small><strong>${c.reprovado+c.cancelado}</strong></div>
   </div>
-  <div class="grid mini-kpis"><div class="card mini-kpi"><small>Clientes</small><b>${uniqueClients}</b></div><div class="card mini-kpi"><small>Valor em pedidos</small><b>${money(totalValue)}</b></div><div class="card mini-kpi"><small>Enviados ao Dashboard</small><b>${c.synced}</b></div><div class="card mini-kpi"><small>Concluídos</small><b>${c.concluido}</b></div></div>
-  <div class="dashboard-two"><div class="card section-card"><div class="section-title"><div><h2>Pedidos recentes</h2><p>Últimas movimentações cadastradas.</p></div><button class="btn" onclick="go('pedidos')">Ver todos</button></div><div class="table-wrap"><table class="table dashboard-table"><thead><tr><th>Cliente</th><th>Consultor</th><th>Status</th><th>Valor</th></tr></thead><tbody>${recent.length?recent.map(o=>`<tr class="order-row" onclick="editOrder('${o.id}')"><td><b>${esc(o.razao_social)}</b><br><small>${esc(o.numero_pedido||'')}</small></td><td>${esc(o.consultor)}</td><td><span class="badge ${statusClass(o.status_pedido)}">${esc(o.status_pedido)}</span></td><td>${money(o.valor_contrato)}</td></tr>`).join(''):'<tr><td colspan="4"><div class="empty">Nenhum pedido cadastrado.</div></td></tr>'}</tbody></table></div></div>
-  <div class="card section-card"><div class="section-title"><div><h2>Por consultor</h2><p>Volume de pedidos e aprovados.</p></div></div><div class="table-wrap"><table class="table dashboard-table"><thead><tr><th>Consultor</th><th>Pedidos</th><th>Aprovados</th><th>Valor</th></tr></thead><tbody>${sellers.length?sellers.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${x.pedidos}</td><td>${x.aprovados}</td><td>${money(x.valor)}</td></tr>`).join(''):'<tr><td colspan="4"><div class="empty">Sem dados.</div></td></tr>'}</tbody></table></div></div></div>`);
+  <div class="grid mini-kpis"><div class="card mini-kpi"><small>Clientes</small><b>${uniqueClients}</b></div><div class="card mini-kpi"><small>Enviados ao Dashboard</small><b>${c.synced}</b></div><div class="card mini-kpi"><small>Concluídos</small><b>${c.concluido}</b></div></div>
+  <div class="dashboard-two"><div class="card section-card"><div class="section-title"><div><h2>Pedidos recentes</h2><p>Últimas movimentações cadastradas.</p></div><button class="btn" onclick="go('pedidos')">Ver todos</button></div><div class="table-wrap"><table class="table dashboard-table"><thead><tr><th>Cliente</th><th>Consultor</th><th>Status</th></tr></thead><tbody>${recent.length?recent.map(o=>`<tr class="order-row" onclick="editOrder('${o.id}')"><td><b>${esc(o.razao_social)}</b><br><small>${esc(o.numero_pedido||'')}</small></td><td>${esc(o.consultor)}</td><td><span class="badge ${statusClass(o.status_pedido)}">${esc(o.status_pedido)}</span></td></tr>`).join(''):'<tr><td colspan="3"><div class="empty">Nenhum pedido cadastrado.</div></td></tr>'}</tbody></table></div></div>
+  <div class="card section-card"><div class="section-title"><div><h2>Por consultor</h2><p>Volume de pedidos e aprovados.</p></div></div><div class="table-wrap"><table class="table dashboard-table"><thead><tr><th>Consultor</th><th>Pedidos</th><th>Aprovados</th></tr></thead><tbody>${sellers.length?sellers.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${x.pedidos}</td><td>${x.aprovados}</td></tr>`).join(''):'<tr><td colspan="3"><div class="empty">Sem dados.</div></td></tr>'}</tbody></table></div></div></div>`);
 }
-
 function pct(part,total){return total?Math.round((part/total)*100):0}
 function renderStatusBar(label,value,total,cls=''){const w=pct(value,total);return `<div class="tv-status-row"><div class="tv-status-head"><span>${esc(label)}</span><b>${value}</b></div><div class="tv-track"><i class="${cls}" style="width:${w}%"></i></div></div>`}
 function tvClock(){const n=new Date();return n.toLocaleString('pt-BR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}).replace(/^./,x=>x.toUpperCase())}
 async function refreshTv(){try{await loadOrders();if(currentView==='tv')renderTvDashboard(false)}catch(e){console.error(e)}}
 function renderTvDashboard(startTimer=true){
-  const c=statusCounts(orders), totalValue=orders.reduce((a,o)=>a+Number(o.valor_contrato||0),0), uniqueClients=new Set(orders.map(o=>cleanCnpj(o.cnpj)).filter(Boolean)).size;
+  const c=statusCounts(orders), uniqueClients=new Set(orders.map(o=>cleanCnpj(o.cnpj)).filter(Boolean)).size;
   const sellers=groupSummary(orders,o=>o.consultor).slice(0,6);
   const attention=orders.filter(o=>{const s=norm(o.status_pedido);return s.includes('analise')||s.includes('aguardando')||s==='em andamento'}).slice(0,7);
   const approvedRate=pct(c.aprovado,c.total), pending=c.analiseBko+c.credito+c.fraude+c.aguardando+c.andamento;
-  app.innerHTML=`<div class="tv-shell"><header class="tv-head"><div class="tv-brand"><img src="logo-viva.png"><div><span>CENTRAL OPERACIONAL</span><h1>Dashboard BKO</h1></div></div><div class="tv-head-right"><div><b>Atualização automática</b><span id="tvClock">${tvClock()}</span></div><button class="tv-exit" onclick="go('dashboard')">Sair do modo TV</button></div></header>
+  app.innerHTML=`<div class="tv-shell"><header class="tv-head"><div class="tv-brand"><img src="logo-viva.png"><div><span>CENTRAL OPERACIONAL</span><h1>Dashboard BKO</h1></div></div><div class="tv-head-right"><div><b>Atualização automática</b><span id="tvClock">${tvClock()}</span></div><div class="tv-zoom" aria-label="Tamanho do painel"><button type="button" onclick="changeTvZoom(-0.1)" title="Diminuir">−</button><button type="button" id="tvZoomLabel" onclick="resetTvZoom()" title="Voltar para 100%">100%</button><button type="button" onclick="changeTvZoom(0.1)" title="Aumentar">+</button></div><button class="tv-exit" onclick="go('dashboard')">Sair do modo TV</button></div></header>
   <section class="tv-hero"><div><span class="tv-eyebrow">VISÃO GERAL DA OPERAÇÃO</span><h2>${c.total} pedidos acompanhados</h2><p>Atualização automática a cada 30 segundos • somente aprovados seguem para o Dashboard comercial.</p></div><div class="tv-rate"><strong>${approvedRate}%</strong><span>taxa de aprovação</span></div></section>
   <section class="tv-kpis">
     <article class="tv-kpi total"><span>Total de pedidos</span><strong>${c.total}</strong><small>${uniqueClients} cliente(s)</small></article>
@@ -77,10 +79,11 @@ function renderTvDashboard(startTimer=true){
     <article class="tv-panel status-panel"><div class="tv-panel-title"><div><span>PIPELINE</span><h3>Pedidos por status</h3></div><b>${c.total}</b></div>
       ${renderStatusBar('Análise BKO',c.analiseBko,c.total,'amber')}${renderStatusBar('Análise de crédito',c.credito,c.total,'amber')}${renderStatusBar('Análise de fraude',c.fraude,c.total,'orange')}${renderStatusBar('Aguardando informação',c.aguardando,c.total,'blue')}${renderStatusBar('Em andamento',c.andamento,c.total,'blue')}${renderStatusBar('Aprovados',c.aprovado,c.total,'green')}
     </article>
-    <article class="tv-panel"><div class="tv-panel-title"><div><span>DESTAQUES</span><h3>Por consultor</h3></div><b>${sellers.length}</b></div><div class="tv-ranking">${sellers.length?sellers.map((x,i)=>`<div class="tv-rank"><span class="tv-pos">${i+1}º</span><div><b>${esc(x.name)}</b><small>${x.aprovados} aprovado(s) de ${x.pedidos}</small></div><strong>${money(x.valor)}</strong></div>`).join(''):'<div class="tv-empty">Sem dados ainda.</div>'}</div></article>
+    <article class="tv-panel"><div class="tv-panel-title"><div><span>DESTAQUES</span><h3>Por consultor</h3></div><b>${sellers.length}</b></div><div class="tv-ranking">${sellers.length?sellers.map((x,i)=>`<div class="tv-rank"><span class="tv-pos">${i+1}º</span><div><b>${esc(x.name)}</b><small>${x.aprovados} aprovado(s) de ${x.pedidos}</small></div><strong>${x.pedidos}</strong></div>`).join(''):'<div class="tv-empty">Sem dados ainda.</div>'}</div></article>
     <article class="tv-panel attention-panel"><div class="tv-panel-title"><div><span>ATENÇÃO</span><h3>Pedidos em acompanhamento</h3></div><b>${attention.length}</b></div><div class="tv-attention-list">${attention.length?attention.map(o=>`<div class="tv-attention"><div><b>${esc(o.razao_social)}</b><small>${esc(o.consultor)} • ${esc(o.numero_pedido||'Sem nº pedido')}</small></div><span class="tv-status-pill ${statusClass(o.status_pedido)}">${esc(o.status_pedido)}</span></div>`).join(''):'<div class="tv-empty">Nenhum pedido pendente no momento.</div>'}</div></article>
-    <article class="tv-panel numbers-panel"><div class="tv-panel-title"><div><span>INDICADORES</span><h3>Resumo financeiro</h3></div></div><div class="tv-number"><span>Valor total em pedidos</span><strong>${money(totalValue)}</strong></div><div class="tv-number"><span>Concluídos</span><strong>${c.concluido}</strong></div><div class="tv-number"><span>Sincronizados com Dashboard</span><strong>${c.synced}</strong></div></article>
+    <article class="tv-panel numbers-panel"><div class="tv-panel-title"><div><span>OPERAÇÃO</span><h3>Indicadores de acompanhamento</h3></div></div><div class="tv-number"><span>Clientes acompanhados</span><strong>${uniqueClients}</strong></div><div class="tv-number"><span>Concluídos</span><strong>${c.concluido}</strong></div><div class="tv-number"><span>Sincronizados com Dashboard</span><strong>${c.synced}</strong></div></article>
   </section><footer class="tv-footer"><span>Viva Conecta • Sistema BKO</span><span>Operação acompanhada em tempo real</span></footer></div>`;
+  applyTvZoom();
   if(startTimer&&!tvTimer)tvTimer=setInterval(refreshTv,30000);
 }
 
