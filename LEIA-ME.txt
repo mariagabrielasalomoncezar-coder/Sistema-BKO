@@ -1,3 +1,29 @@
+VIVA CONECTA • SISTEMA BKO v1.5
+
+NOVIDADE PRINCIPAL
+O formulário Novo Pedido agora espelha as colunas da planilha BKO: Data da Venda, Mês, Tramitação, Vendedor, Razão Social, CNPJ, Endereço/Instalação, Cidade, Representante, Contato, E-mail, Débito Automático, Quality, Vencimento, Tipo de Cliente, Produto, Tronco, Sub Produto, Sub Item, Delta, Outro, Quantidade, Valor Unitário, Valor Contrato, Simulação, Sistema Vivo, Status do Pedido, Cotação, Nº Pedido, Data de Agendamento, Status de Entrega, Data de Entrega, Observações, Previsão de Comissão, Data de Conclusão e Observações Extras.
+
+IMPORTANTE PARA QUEM JÁ USA A V1.4
+1. Suba esta pasta na Vercel.
+2. No Supabase, abra SQL Editor.
+3. Execute UMA VEZ o arquivo BKO-UPGRADE-v1.5.sql.
+4. Atualize o Sistema BKO.
+
+O upgrade apenas adiciona colunas. Não apaga pedidos existentes e não substitui o Dashboard comercial.
+
+REGRAS MANTIDAS
+- Consultor continua preenchendo Equipe automaticamente.
+- Mês é preenchido pela Data da Venda.
+- Vencimento pode seguir as Regras Automáticas.
+- Valor do contrato pode ser calculado por Quantidade x Valor Unitário.
+- Somente pedido APROVADO é enviado ao Dashboard comercial.
+- Produto no Dashboard continua sendo escolhido separadamente para garantir o lançamento na torre correta.
+
+VIVA CONECTA • SISTEMA BKO V1.4
+
+Novidades: Dashboard BKO, contadores por status nos filtros, exportação .xlsx real e remoção do campo Sistema Vivo da interface.
+Não é necessário executar novo SQL se a V1 já foi configurada.
+
 VIVA CONECTA • SISTEMA DE ALIMENTAÇÃO BKO • V1
 
 O QUE ESTA VERSÃO JÁ FAZ
