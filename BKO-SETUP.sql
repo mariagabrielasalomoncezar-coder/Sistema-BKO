@@ -11,6 +11,7 @@ create table if not exists public.bko_clients (
   cnpj text not null unique,
   razao_social text not null,
   gestor text,
+  dados_cnpj jsonb,
   created_by uuid references auth.users(id),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -65,6 +66,8 @@ create table if not exists public.bko_orders (
   previsao_comissao text,
   data_conclusao date,
   obs_extras text,
+  dados_cnpj jsonb,
+  itens_comerciais jsonb,
   numero_pedido text,
   status_pedido text not null default 'ANÁLISE BKO',
   status_entrega text,

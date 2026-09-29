@@ -1,0 +1,27 @@
+VIVA CONECTA • SISTEMA BKO V1.8
+
+ATUALIZAÇÃO PARA O PROJETO QUE JÁ ESTÁ NO AR
+
+1) SUPABASE — FAZER PRIMEIRO
+Abra o SQL Editor do mesmo Supabase do Sistema BKO.
+Execute todo o arquivo: BKO-UPGRADE-v1.8.sql
+Esse SQL não apaga os pedidos existentes.
+
+2) VERCEL
+Depois, suba esta pasta/ZIP no mesmo projeto da Vercel como você já faz nas atualizações.
+Mantenha o arquivo config.js com as mesmas credenciais atuais.
+
+NOVIDADES DA V1.8
+- CNPJ consulta automaticamente dados públicos da empresa.
+- Campo Tronco removido da tela de Novo Pedido.
+- Produto, Sub Produto e Sub Item com pesquisa e seleção.
+- Botão + Adicionar Produto: vários produtos no mesmo pedido/cliente.
+- Migração envia ao Dashboard somente o valor do Delta.
+- Vencimentos disponíveis: 03, 15, 17 e 25.
+- Rascunho automático do Novo Pedido, inclusive ao trocar de tela/aba.
+- Novo card Aguardando Instalação no Dashboard BKO.
+- Aba/filtro Aguardando Instalação em Relatórios.
+
+IMPORTANTE
+Pedidos antigos continuam compatíveis. Ao executar o upgrade SQL, cada pedido antigo
+é convertido internamente para 1 item comercial sem apagar os campos antigos.
