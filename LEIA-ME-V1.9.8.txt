@@ -1,0 +1,9 @@
+VIVA CONECTA BKO — v1.9.8
+
+Ajustes desta versão:
+- Corrigido preenchimento automático da Razão Social quando a consulta usa ReceitaWS (campo `nome`).
+- Corrigido preenchimento do Representante pelo QSA da ReceitaWS (campos `nome` e `qual`), priorizando administrador/titular/presidente/diretor/sócio-administrador.
+- Mantidos os fallbacks existentes para BrasilAPI/Minha Receita e demais formatos.
+- Mantida a exportação detalhada com uma linha por produto do pedido.
+
+Não exige SQL novo.
