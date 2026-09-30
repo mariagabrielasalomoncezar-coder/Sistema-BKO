@@ -1,0 +1,19 @@
+VIVA CONECTA BKO — v1.9.6
+
+ALTERAÇÕES
+1. Consulta de CNPJ corrigida para produção na Vercel.
+   - O navegador agora consulta /api/cnpj no próprio domínio do sistema.
+   - A função serverless tenta BrasilAPI, Minha Receita e ReceitaWS, nesta ordem.
+   - Isso evita o problema de CORS/bloqueio do navegador que fazia aparecer
+     “Não foi possível consultar agora”.
+   - Não precisa rodar SQL.
+
+2. Exportação detalhada continua no formato por produto.
+   - Um pedido com vários produtos gera uma linha por produto.
+   - Os dados gerais do pedido/CNPJ são repetidos em cada linha.
+   - A coluna “Item do Pedido” identifica 1, 2, 3...
+
+PUBLICAÇÃO
+- Suba TODO o conteúdo desta pasta para o repositório do GitHub.
+- É importante incluir a nova pasta api/ e o arquivo api/cnpj.js.
+- Aguarde a nova implantação da Vercel terminar antes de testar.

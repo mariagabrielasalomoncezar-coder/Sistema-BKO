@@ -169,11 +169,28 @@ function formatPhone(v){const n=String(v||'').replace(/\D/g,'');if(n.length===11
 function joinAddress(parts){return parts.map(v=>String(v??'').trim()).filter(Boolean).join(', ').replace(/,\s*,/g,', ')}
 async function fetchJsonWithTimeout(url,timeout=9000){const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),timeout);try{const r=await fetch(url,{signal:ctrl.signal,headers:{Accept:'application/json'}});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.json()}finally{clearTimeout(timer)}}
 async function lookupCepAddress(cep){const clean=String(cep||'').replace(/\D/g,'');if(clean.length!==8)return null;const urls=[`https://brasilapi.com.br/api/cep/v2/${clean}`,`https://brasilapi.com.br/api/cep/v1/${clean}`,`https://viacep.com.br/ws/${clean}/json/`];for(const url of urls){try{const b=await fetchJsonWithTimeout(url,7000);if(b?.erro)continue;return{logradouro:firstText(b.street,b.logradouro),bairro:firstText(b.neighborhood,b.bairro),cidade:firstText(b.city,b.localidade,b.municipio),uf:firstText(b.state,b.uf)}}catch{}}return null}
-async function fetchCnpjData(cnpj){const providers=[
-  {name:'BrasilAPI',url:`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`},
-  {name:'BrasilAPI alternativa',url:`https://brasilapi.com.br/cnpj/v1/${cnpj}`},
-  {name:'Minha Receita',url:`https://minhareceita.org/${cnpj}`}
-];let lastError=null;for(const p of providers){try{const data=await fetchJsonWithTimeout(p.url,10000);if(data&&typeof data==='object'&&!Array.isArray(data))return{data,source:p.name}}catch(e){lastError=e;console.warn(`Consulta CNPJ via ${p.name}:`,e)}}throw lastError||new Error('Nenhuma fonte respondeu')}
+async function fetchCnpjData(cnpj){
+  // Produção: consulta pelo backend da própria Vercel. Isso evita bloqueios de CORS
+  // no iPad/celular e permite trocar automaticamente de fonte quando uma API cai.
+  try{
+    const proxy=await fetchJsonWithTimeout(`/api/cnpj?cnpj=${encodeURIComponent(cnpj)}`,12000);
+    if(proxy?.data&&typeof proxy.data==='object')return{data:proxy.data,source:proxy.source||'Consulta CNPJ'};
+  }catch(e){console.warn('Proxy CNPJ indisponível, tentando consulta direta:',e)}
+
+  // Fallback para testes locais/ambientes sem a função /api.
+  const providers=[
+    {name:'BrasilAPI',url:`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`},
+    {name:'Minha Receita',url:`https://minhareceita.org/${cnpj}`}
+  ];
+  let lastError=null;
+  for(const p of providers){
+    try{
+      const data=await fetchJsonWithTimeout(p.url,9000);
+      if(data&&typeof data==='object'&&!Array.isArray(data)&&!data.error&&!data.erro)return{data,source:p.name};
+    }catch(e){lastError=e;console.warn(`Consulta CNPJ via ${p.name}:`,e)}
+  }
+  throw lastError||new Error('Nenhuma fonte respondeu');
+}
 async function lookupCnpj(){
   const c=cleanCnpj(document.getElementById('cnpj')?.value);
   const hint=document.getElementById('cnpjHint');
