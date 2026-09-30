@@ -170,14 +170,30 @@ function joinAddress(parts){return parts.map(v=>String(v??'').trim()).filter(Boo
 async function fetchJsonWithTimeout(url,timeout=9000){const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),timeout);try{const r=await fetch(url,{signal:ctrl.signal,headers:{Accept:'application/json'}});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.json()}finally{clearTimeout(timer)}}
 async function lookupCepAddress(cep){const clean=String(cep||'').replace(/\D/g,'');if(clean.length!==8)return null;const urls=[`https://brasilapi.com.br/api/cep/v2/${clean}`,`https://brasilapi.com.br/api/cep/v1/${clean}`,`https://viacep.com.br/ws/${clean}/json/`];for(const url of urls){try{const b=await fetchJsonWithTimeout(url,7000);if(b?.erro)continue;return{logradouro:firstText(b.street,b.logradouro),bairro:firstText(b.neighborhood,b.bairro),cidade:firstText(b.city,b.localidade,b.municipio),uf:firstText(b.state,b.uf)}}catch{}}return null}
 async function fetchCnpjData(cnpj){
-  // Produção: consulta pelo backend da própria Vercel. Isso evita bloqueios de CORS
-  // no iPad/celular e permite trocar automaticamente de fonte quando uma API cai.
+  // Fonte principal: Edge Function no mesmo Supabase já usado pelo BKO.
+  // Isso evita CORS/bloqueios do navegador e não depende da estrutura de /api da Vercel.
+  try{
+    const r=await fetch(`${SB}/functions/v1/consulta-cnpj-bko?cnpj=${encodeURIComponent(cnpj)}`,{
+      method:'GET',
+      headers:{
+        Accept:'application/json',
+        apikey:KEY,
+        Authorization:`Bearer ${token()||KEY}`
+      }
+    });
+    let body=null;try{body=await r.json()}catch{}
+    if(!r.ok)throw new Error(body?.error||`Consulta Supabase: HTTP ${r.status}`);
+    if(body?.data&&typeof body.data==='object')return{data:body.data,source:body.source||'Consulta Supabase'};
+    throw new Error('Consulta Supabase sem dados');
+  }catch(e){console.warn('Consulta CNPJ pelo Supabase indisponível, tentando alternativas:',e)}
+
+  // Reserva 1: função serverless da Vercel, caso esteja disponível no deploy.
   try{
     const proxy=await fetchJsonWithTimeout(`/api/cnpj?cnpj=${encodeURIComponent(cnpj)}`,12000);
-    if(proxy?.data&&typeof proxy.data==='object')return{data:proxy.data,source:proxy.source||'Consulta CNPJ'};
-  }catch(e){console.warn('Proxy CNPJ indisponível, tentando consulta direta:',e)}
+    if(proxy?.data&&typeof proxy.data==='object')return{data:proxy.data,source:proxy.source||'Consulta Vercel'};
+  }catch(e){console.warn('Proxy CNPJ da Vercel indisponível:',e)}
 
-  // Fallback para testes locais/ambientes sem a função /api.
+  // Reserva 2: consultas diretas para ambientes locais.
   const providers=[
     {name:'BrasilAPI',url:`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`},
     {name:'Minha Receita',url:`https://minhareceita.org/${cnpj}`}

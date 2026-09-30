@@ -1,0 +1,10 @@
+VIVA CONECTA — BKO v1.9.7
+
+Alterações:
+- Consulta de CNPJ corrigida para usar como fonte principal uma Edge Function do Supabase.
+- A Edge Function consulta as fontes externas no servidor, evitando bloqueios de CORS no navegador/iPad.
+- Mantidos fallbacks pela Vercel e pelas APIs públicas.
+- Mantida exportação detalhada: um pedido com vários produtos gera uma linha por produto na planilha.
+
+A Edge Function "consulta-cnpj-bko" já foi publicada no Supabase do projeto.
+Não é necessário executar SQL para esta atualização.
