@@ -1,0 +1,13 @@
+VIVA CONECTA • SISTEMA BKO v1.8.1
+
+CORREÇÃO PRINCIPAL
+- O pedido NÃO sobe mais para o Dashboard apenas por estar APROVADO.
+- O envio ao Dashboard acontece somente quando:
+  1) Status do Pedido = APROVADO
+  2) Status de Entrega = CONCLUÍDO
+- Em pedidos de MIGRAÇÃO, continua subindo somente o valor do DELTA.
+- Se um pedido já sincronizado deixar de atender essas condições, ele é retirado do Dashboard para evitar contabilização incorreta.
+- Edições em pedidos já concluídos atualizam o Dashboard sem duplicar lançamentos.
+
+Não é necessário rodar novo SQL para esta correção.
+Suba este ZIP na Vercel no lugar da versão anterior.
