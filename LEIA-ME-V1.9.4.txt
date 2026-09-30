@@ -1,0 +1,19 @@
+SISTEMA BKO VIVA CONECTA — V1.9.4
+
+ATUALIZAÇÃO — CONSULTA DE CNPJ
+- A consulta de CNPJ agora tenta preencher automaticamente:
+  • Razão Social
+  • Endereço / Instalação
+  • Cidade
+  • Representante, quando disponível na base pública
+  • Contato / telefone, quando disponível
+  • E-mail, quando disponível
+- O endereço ganhou uma segunda tentativa pela consulta de CEP quando o CNPJ não devolve o logradouro completo.
+- O representante considera representante legal e sócio/administrador retornados pela consulta.
+- Telefone é formatado automaticamente.
+- Os detalhes do CNPJ agora também exibem Cidade, Telefone e E-mail quando existirem.
+- Caso algum dado não esteja disponível na base pública, o campo continua livre para preenchimento manual.
+
+IMPORTANTE
+- Não há alteração de banco de dados / SQL nesta versão.
+- As regras de pedidos, exclusão e Dashboard da v1.9.3 foram preservadas.

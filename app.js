@@ -46,7 +46,7 @@ function scheduleDraftSave(){clearTimeout(draftTimer);draftTimer=setTimeout(save
 function saveDraftNow(){if(currentView!=='novo'||!document.getElementById('orderForm'))return;try{const data=collectFormState(true);localStorage.setItem(draftKey(),JSON.stringify({savedAt:new Date().toISOString(),data}));const el=document.getElementById('draftStatus');if(el)el.textContent='Rascunho salvo automaticamente ✓'}catch(e){console.warn('draft',e)}}
 function discardDraft(){if(confirm('Descartar o rascunho deste pedido?')){clearDraft();renderForm(null,true);toast('Rascunho descartado')}}
 function formatCnpjInput(el){let v=cleanCnpj(el.value).slice(0,14);v=v.replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3').replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\/\d{4})(\d)/,'$1-$2');el.value=v;if(cleanCnpj(v).length===14)lookupCnpj()}
-function renderCnpjDetails(d){const box=document.getElementById('cnpjDetails');if(!box)return;if(!d){box.innerHTML='';return}const rows=[['Nome fantasia',d.nome_fantasia],['Situação',d.situacao],['Abertura',d.abertura],['CEP',d.cep],['Endereço',d.endereco],['Bairro',d.bairro],['UF',d.uf],['CNAE',d.cnae],['Porte',d.porte],['Natureza jurídica',d.natureza_juridica],['Matriz/Filial',d.matriz_filial],['Representante',d.representante]].filter(x=>x[1]);box.innerHTML=rows.length?`<div class="cnpj-details">${rows.map(([k,v])=>`<div><small>${esc(k)}</small><b>${esc(v)}</b></div>`).join('')}</div>`:''}
+function renderCnpjDetails(d){const box=document.getElementById('cnpjDetails');if(!box)return;if(!d){box.innerHTML='';return}const rows=[['Nome fantasia',d.nome_fantasia],['Situação',d.situacao],['Abertura',d.abertura],['CEP',d.cep],['Endereço',d.endereco],['Bairro',d.bairro],['Cidade',d.cidade],['UF',d.uf],['Telefone',d.telefone],['E-mail',d.email],['CNAE',d.cnae],['Porte',d.porte],['Natureza jurídica',d.natureza_juridica],['Matriz/Filial',d.matriz_filial],['Representante',d.representante]].filter(x=>x[1]);box.innerHTML=rows.length?`<div class="cnpj-details">${rows.map(([k,v])=>`<div><small>${esc(k)}</small><b>${esc(v)}</b></div>`).join('')}</div>`:''}
 
 function saveSession(s){session=s;if(s)localStorage.setItem(AUTH,JSON.stringify(s));else localStorage.removeItem(AUTH)}
 function loadSession(){try{session=JSON.parse(localStorage.getItem(AUTH)||'null')}catch{session=null}}
@@ -164,7 +164,100 @@ function fillTeam(update=true){const p=consultants().find(x=>x.name===consultor.
 function applyRule(){return}
 function calcTotal(){return}
 function cleanCnpj(v){return String(v||'').replace(/\D/g,'')}
-async function lookupCnpj(){const c=cleanCnpj(document.getElementById('cnpj')?.value);const hint=document.getElementById('cnpjHint');if(c.length!==14){if(hint)hint.textContent='CNPJ deve ter 14 dígitos.';return}if(hint)hint.textContent='Consultando CNPJ...';const local=clients.find(x=>cleanCnpj(x.cnpj)===c);try{let d=null;const r=await fetch(`https://brasilapi.com.br/api/cnpj/v1/${c}`);if(r.ok){const b=await r.json();const qsa=Array.isArray(b.qsa)?b.qsa:[];const rep=qsa.find(x=>/administrador|titular|presidente|diretor/i.test(String(x.qualificacao_socio||'')))||qsa[0]||{};d={razao_social:b.razao_social||'',nome_fantasia:b.nome_fantasia||'',situacao:b.descricao_situacao_cadastral||'',abertura:b.data_inicio_atividade||'',cep:b.cep||'',endereco:[b.descricao_tipo_de_logradouro,b.logradouro,b.numero,b.complemento].filter(Boolean).join(' '),bairro:b.bairro||'',cidade:b.municipio||'',uf:b.uf||'',telefone:b.ddd_telefone_1||b.ddd_telefone_2||'',email:b.email||'',cnae:[b.cnae_fiscal,b.cnae_fiscal_descricao].filter(Boolean).join(' - '),porte:b.porte||'',natureza_juridica:b.descricao_natureza_juridica||'',matriz_filial:b.descricao_identificador_matriz_filial||'',representante:rep.nome_socio||''}}if(!d&&local?.dados_cnpj)d=local.dados_cnpj;if(d){currentCnpjData=d;if(d.razao_social)razao.value=d.razao_social;if(!enderecoInstalacao.value)enderecoInstalacao.value=d.endereco||'';if(!cidade.value)cidade.value=d.cidade||'';if(!representante.value)representante.value=d.representante||'';if(!contato.value)contato.value=d.telefone||'';if(!emailCliente.value)emailCliente.value=d.email||'';renderCnpjDetails(d);if(hint)hint.textContent='Dados do CNPJ preenchidos automaticamente ✓';if(window.sCliente)sCliente.textContent=razao.value||'-';scheduleDraftSave();return}throw new Error('Sem dados')}catch(e){if(local){razao.value=local.razao_social||razao.value;if(local.dados_cnpj){currentCnpjData=local.dados_cnpj;if(!representante.value)representante.value=currentCnpjData.representante||'';renderCnpjDetails(currentCnpjData)}if(hint)hint.textContent='Cliente encontrado na base ✓'}else if(hint)hint.textContent='Não foi possível consultar agora. Você pode preencher manualmente.'}}
+function firstText(...values){for(const v of values){const t=String(v??'').trim();if(t)return t}return''}
+function formatPhone(v){const n=String(v||'').replace(/\D/g,'');if(n.length===11)return`(${n.slice(0,2)}) ${n.slice(2,7)}-${n.slice(7)}`;if(n.length===10)return`(${n.slice(0,2)}) ${n.slice(2,6)}-${n.slice(6)}`;return String(v||'').trim()}
+function joinAddress(parts){return parts.map(v=>String(v??'').trim()).filter(Boolean).join(', ').replace(/,\s*,/g,', ')}
+async function lookupCepAddress(cep){const clean=String(cep||'').replace(/\D/g,'');if(clean.length!==8)return null;try{const r=await fetch(`https://brasilapi.com.br/api/cep/v2/${clean}`);if(!r.ok)return null;const b=await r.json();return{logradouro:firstText(b.street,b.logradouro),bairro:firstText(b.neighborhood,b.bairro),cidade:firstText(b.city,b.localidade,b.municipio),uf:firstText(b.state,b.uf)}}catch{return null}}
+async function lookupCnpj(){
+  const c=cleanCnpj(document.getElementById('cnpj')?.value);
+  const hint=document.getElementById('cnpjHint');
+  const fields={
+    razao:document.getElementById('razao'),
+    endereco:document.getElementById('enderecoInstalacao'),
+    cidade:document.getElementById('cidade'),
+    representante:document.getElementById('representante'),
+    contato:document.getElementById('contato'),
+    email:document.getElementById('emailCliente')
+  };
+  if(c.length!==14){if(hint)hint.textContent='CNPJ deve ter 14 dígitos.';return}
+  if(hint)hint.textContent='Consultando CNPJ...';
+  const local=clients.find(x=>cleanCnpj(x.cnpj)===c);
+  try{
+    let d=null;
+    const r=await fetch(`https://brasilapi.com.br/api/cnpj/v1/${c}`);
+    if(r.ok){
+      const b=await r.json();
+      const qsa=Array.isArray(b.qsa)?b.qsa:[];
+      const repLegal=qsa.find(x=>firstText(x.nome_representante_legal));
+      const repSocio=qsa.find(x=>/administrador|titular|presidente|diretor|sócio-administrador|socio-administrador/i.test(String(x.qualificacao_socio||'')))||qsa[0]||{};
+      let logradouro=firstText(b.logradouro,b.street,b.endereco);
+      let bairro=firstText(b.bairro,b.neighborhood);
+      let cidadeCnpj=firstText(b.municipio,b.cidade,b.city,b.localidade);
+      let uf=firstText(b.uf,b.state);
+      const cep=firstText(b.cep);
+      if((!logradouro||!cidadeCnpj)&&cep){
+        const viaCep=await lookupCepAddress(cep);
+        if(viaCep){logradouro=logradouro||viaCep.logradouro;bairro=bairro||viaCep.bairro;cidadeCnpj=cidadeCnpj||viaCep.cidade;uf=uf||viaCep.uf}
+      }
+      const tipoLogradouro=firstText(b.descricao_tipo_de_logradouro,b.tipo_logradouro);
+      const streetComplete=[tipoLogradouro,logradouro].filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+      const endereco=joinAddress([streetComplete,firstText(b.numero),firstText(b.complemento)]);
+      const representante=firstText(repLegal?.nome_representante_legal,repSocio?.nome_representante_legal,repSocio?.nome_socio,b.nome_representante_legal);
+      d={
+        razao_social:firstText(b.razao_social,b.nome_empresarial),
+        nome_fantasia:firstText(b.nome_fantasia),
+        situacao:firstText(b.descricao_situacao_cadastral,b.situacao),
+        abertura:firstText(b.data_inicio_atividade,b.abertura),
+        cep,
+        endereco,
+        bairro,
+        cidade:cidadeCnpj,
+        uf,
+        telefone:formatPhone(firstText(b.ddd_telefone_1,b.ddd_telefone_2,b.telefone,b.phone)),
+        email:firstText(b.email,b.correio_eletronico),
+        cnae:[firstText(b.cnae_fiscal),firstText(b.cnae_fiscal_descricao)].filter(Boolean).join(' - '),
+        porte:firstText(b.porte,b.descricao_porte),
+        natureza_juridica:firstText(b.descricao_natureza_juridica,b.natureza_juridica),
+        matriz_filial:firstText(b.descricao_identificador_matriz_filial),
+        representante
+      };
+    }
+    if(local?.dados_cnpj)d={...(local.dados_cnpj||{}),...(d||{})};
+    if(!d&&local?.dados_cnpj)d=local.dados_cnpj;
+    if(d){
+      currentCnpjData=d;
+      if(fields.razao&&d.razao_social)fields.razao.value=d.razao_social;
+      if(fields.endereco&&d.endereco)fields.endereco.value=d.endereco;
+      if(fields.cidade&&d.cidade)fields.cidade.value=d.cidade;
+      if(fields.representante&&d.representante)fields.representante.value=d.representante;
+      if(fields.contato&&d.telefone)fields.contato.value=d.telefone;
+      if(fields.email&&d.email)fields.email.value=d.email;
+      renderCnpjDetails(d);
+      const preenchidos=[d.razao_social,d.endereco,d.cidade,d.representante,d.telefone,d.email].filter(Boolean).length;
+      if(hint)hint.textContent=preenchidos>2?'Dados do CNPJ preenchidos automaticamente ✓':'CNPJ localizado. Alguns dados não estão disponíveis na base e podem ser preenchidos manualmente.';
+      const sCliente=document.getElementById('sCliente');if(sCliente)sCliente.textContent=fields.razao?.value||'-';
+      scheduleDraftSave();
+      return;
+    }
+    throw new Error('Sem dados');
+  }catch(e){
+    console.warn('Consulta CNPJ:',e);
+    if(local){
+      if(fields.razao)local.razao_social&&(fields.razao.value=local.razao_social);
+      if(local.dados_cnpj){
+        currentCnpjData=local.dados_cnpj;
+        const d=currentCnpjData;
+        if(fields.endereco&&!fields.endereco.value)fields.endereco.value=d.endereco||'';
+        if(fields.cidade&&!fields.cidade.value)fields.cidade.value=d.cidade||'';
+        if(fields.representante&&!fields.representante.value)fields.representante.value=d.representante||'';
+        if(fields.contato&&!fields.contato.value)fields.contato.value=d.telefone||'';
+        if(fields.email&&!fields.email.value)fields.email.value=d.email||'';
+        renderCnpjDetails(d);
+      }
+      if(hint)hint.textContent='Cliente encontrado na base ✓';
+    }else if(hint)hint.textContent='Não foi possível consultar agora. Você pode preencher manualmente.';
+  }
+}
 async function saveClientFromForm(){const c=cleanCnpj(cnpj.value);if(c.length!==14)return;const existing=clients.find(x=>cleanCnpj(x.cnpj)===c);const payload={cnpj:c,razao_social:razao.value.trim(),dados_cnpj:currentCnpjData,updated_at:new Date().toISOString()};if(existing){await api(`/rest/v1/bko_clients?id=eq.${existing.id}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(payload)})}else{payload.created_by=uid();await api('/rest/v1/bko_clients',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(payload)})}}
 async function saveOrder(e,id){e.preventDefault();let items;try{items=collectCommercialItems(true)}catch(err){return toast(err.message)}const first=items[0]||{};const totalValue=items.reduce((a,x)=>a+parseNum(x.valor_contrato),0);const totalQty=items.reduce((a,x)=>a+parseNum(x.quantidade),0);const payload={data_venda:dataVenda.value,mes:mes.value||monthName(dataVenda.value)||null,tramitacao:tramitacao.value.trim()||null,cnpj:cleanCnpj(cnpj.value),razao_social:razao.value.trim(),endereco_instalacao:enderecoInstalacao.value.trim()||null,cidade:cidade.value.trim()||null,representante:representante.value.trim()||null,contato:contato.value.trim()||null,email:emailCliente.value.trim()||null,consultor:consultor.value,equipe:equipe.value,bko_responsavel:bkoResponsavel.value||null,subir_dashboard:subirDashboard.value==='SIM',debito_automatico:first.debito_automatico||null,quality:first.quality||null,tipo_cliente:first.tipo_cliente||null,produto_planilha:asArray(first.produto).join(', ')||null,tronco:asArray(first.produto).join(', ')||null,sub_produto:asArray(first.sub_produto).join(', ')||null,sub_item:asArray(first.sub_item).join(', ')||null,delta:first.delta||null,outro:first.outro||null,modalidade:asArray(first.produto).join(', ')||null,produto:null,subproduto:asArray(first.sub_produto).join(', ')||null,dashboard_product:first.dashboard_product||'',vencimento:first.vencimento||null,quantidade:totalQty,valor_unitario:first.valor_unitario,valor_contrato:totalValue,itens_comerciais:items,dados_cnpj:currentCnpjData,simulacao:simulacao.value.trim()||null,sistema_vivo:sistemaVivo.value||null,cotacao:cotacao.value.trim()||null,numero_pedido:numeroPedido.value.trim()||null,status_pedido:statusPedido.value,data_agendamento:dataAgendamento.value.trim()||null,status_entrega:statusEntrega.value||null,data_entrega:dataEntrega.value||null,observacoes:observacoes.value.trim()||null,previsao_comissao:previsaoComissao.value.trim()||null,data_conclusao:dataConclusao.value||null,obs_extras:obsExtras.value.trim()||null,updated_at:new Date().toISOString()};if(payload.cnpj.length!==14)return toast('Confira o CNPJ');const shouldSync=payload.subir_dashboard===true;try{await saveClientFromForm();if(id){const old=orders.find(o=>o.id===id);await api(`/rest/v1/bko_orders?id=eq.${id}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(payload)});if(shouldSync&&!old?.dashboard_synced_at)await syncConcludedOrder(id,payload);else if(shouldSync&&old?.dashboard_synced_at)await syncConcludedEdit(id,old,payload);else if(!shouldSync&&old?.dashboard_synced_at)await unsyncDashboardOrder(id,old)}else{payload.created_by=uid();const created=await api('/rest/v1/bko_orders',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify(payload)});const row=created?.[0];if(shouldSync&&row)await syncConcludedOrder(row.id,payload)}clearDraft();await loadAll();currentView='pedidos';render();toast('Pedido salvo ✓')}catch(err){console.error(err);toast(err.message)}}
 async function editOrder(id){const o=orders.find(x=>x.id===id);if(o)renderForm(o)}
@@ -196,7 +289,7 @@ async function pushDashboardState(state){await api('/rest/v1/viva_state',{method
 async function syncConcludedOrder(id,p){await loadDashboard();const state=JSON.parse(JSON.stringify(dashboardState));state.productionHistory=state.productionHistory||[];if(state.productionHistory.some(h=>h.bkoOrderId===id))return;const items=Array.isArray(p.itens_comerciais)&&p.itens_comerciais.length?p.itens_comerciais:commercialItemsFromOrder(p);const ids=[];items.forEach((it,i)=>{const h={id:`bko-${id}-${i+1}`,bkoOrderId:id,bkoItemIndex:i,source:'BKO',createdAt:new Date().toISOString(),personName:p.consultor,teamName:p.equipe,productName:it.dashboard_product||p.dashboard_product,revenue:dashboardRevenueForItem(it),qty:parseNum(it.quantidade)};applyProduction(state,h,1);state.productionHistory.unshift(h);ids.push(h.id)});await pushDashboardState(state);await api(`/rest/v1/bko_orders?id=eq.${id}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({dashboard_synced_at:new Date().toISOString(),dashboard_entry_id:ids.join(',')})});toast('Pedido enviado ao Dashboard ✓')}
 async function syncConcludedEdit(id,old,p){await loadDashboard();const state=JSON.parse(JSON.stringify(dashboardState));state.productionHistory=state.productionHistory||[];const oldIds=String(old.dashboard_entry_id||'').split(',').filter(Boolean);const previous=state.productionHistory.filter(x=>x.bkoOrderId===id||oldIds.includes(x.id));for(const h of previous)applyProduction(state,h,-1);state.productionHistory=state.productionHistory.filter(x=>!previous.includes(x));const items=Array.isArray(p.itens_comerciais)&&p.itens_comerciais.length?p.itens_comerciais:commercialItemsFromOrder(p);const ids=[];items.forEach((it,i)=>{const h={id:`bko-${id}-${i+1}`,bkoOrderId:id,bkoItemIndex:i,source:'BKO',createdAt:new Date().toISOString(),personName:p.consultor,teamName:p.equipe,productName:it.dashboard_product||p.dashboard_product,revenue:dashboardRevenueForItem(it),qty:parseNum(it.quantidade)};applyProduction(state,h,1);state.productionHistory.unshift(h);ids.push(h.id)});await pushDashboardState(state);await api(`/rest/v1/bko_orders?id=eq.${id}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({dashboard_synced_at:new Date().toISOString(),dashboard_entry_id:ids.join(',')})});toast('Dashboard atualizado ✓')}
 async function unsyncDashboardOrder(id,old){await loadDashboard();const state=JSON.parse(JSON.stringify(dashboardState));state.productionHistory=state.productionHistory||[];const oldIds=String(old.dashboard_entry_id||'').split(',').filter(Boolean);const previous=state.productionHistory.filter(x=>x.bkoOrderId===id||oldIds.includes(x.id));for(const h of previous)applyProduction(state,h,-1);state.productionHistory=state.productionHistory.filter(x=>!previous.includes(x));await pushDashboardState(state);await api(`/rest/v1/bko_orders?id=eq.${id}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({dashboard_synced_at:null,dashboard_entry_id:null})});toast('Pedido retirado do Dashboard ✓') }
-function renderClients(){app.innerHTML=shell(`<div class="card section-card"><div class="section-title"><div><h2>Base de clientes</h2><p>É daqui que o CNPJ completa automaticamente a Razão Social.</p></div><button class="btn primary" onclick="newClient()">+ Cliente</button></div><div class="table-wrap"><table class="table"><thead><tr><th>CNPJ</th><th>Razão Social</th><th></th></tr></thead><tbody>${clients.length?clients.map(c=>`<tr><td>${esc(c.cnpj)}</td><td>${esc(c.razao_social)}</td><td><button class="btn" onclick="newClient('${c.id}')">Editar</button></td></tr>`).join(''):'<tr><td colspan="3"><div class="empty">A base vai sendo criada conforme os pedidos forem cadastrados.</div></td></tr>'}</tbody></table></div></div>`)}
+function renderClients(){app.innerHTML=shell(`<div class="card section-card"><div class="section-title"><div><h2>Base de clientes</h2><p>É daqui que o CNPJ reaproveita automaticamente os dados do cliente.</p></div><button class="btn primary" onclick="newClient()">+ Cliente</button></div><div class="table-wrap"><table class="table"><thead><tr><th>CNPJ</th><th>Razão Social</th><th></th></tr></thead><tbody>${clients.length?clients.map(c=>`<tr><td>${esc(c.cnpj)}</td><td>${esc(c.razao_social)}</td><td><button class="btn" onclick="newClient('${c.id}')">Editar</button></td></tr>`).join(''):'<tr><td colspan="3"><div class="empty">A base vai sendo criada conforme os pedidos forem cadastrados.</div></td></tr>'}</tbody></table></div></div>`)}
 function newClient(id=''){const c=clients.find(x=>x.id===id)||{};document.body.insertAdjacentHTML('beforeend',`<div class="modal-bg" id="clientModal"><div class="modal"><div class="modal-head"><h2>${id?'Editar':'Novo'} cliente</h2><button class="close" onclick="clientModal.remove()">×</button></div><div class="form-grid"><div class="field"><label>CNPJ</label><input id="mcCnpj" value="${esc(c.cnpj||'')}"></div><div class="field span2"><label>Razão Social</label><input id="mcRazao" value="${esc(c.razao_social||'')}"></div></div><div class="actions"><button class="btn" onclick="clientModal.remove()">Cancelar</button><button class="btn primary" onclick="saveClientModal('${id}')">Salvar</button></div></div></div>`)}
 async function saveClientModal(id){const p={cnpj:cleanCnpj(mcCnpj.value),razao_social:mcRazao.value.trim(),updated_at:new Date().toISOString()};if(p.cnpj.length!==14||!p.razao_social)return toast('Informe CNPJ e Razão Social');if(id){await api(`/rest/v1/bko_clients?id=eq.${id}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(p)})}else{p.created_by=uid();await api('/rest/v1/bko_clients',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(p)})}clientModal.remove();await loadClients();renderClients();toast('Cliente salvo ✓')}
 function renderRules(){app.innerHTML=shell(`<div class="notice">Cadastre aqui regras fixas. Exemplo: se a modalidade tiver um vencimento padrão, o sistema preencherá automaticamente no pedido. Não cadastramos valores fictícios.</div><div class="settings-grid"><div class="card list-card"><div class="section-title"><div><h2>Regras de vencimento</h2><p>Modalidade → dia padrão.</p></div><button class="btn primary" onclick="addRule()">+ Regra</button></div>${rules.length?rules.map(r=>`<div class="list-row"><div><b>${esc(r.modalidade)}</b><br><small>${r.active===false?'Inativa':'Ativa'}</small></div><div>Dia <b>${esc(r.vencimento||'-')}</b></div><button class="btn danger" onclick="deleteRule('${r.id}')">Excluir</button></div>`).join(''):'<div class="empty">Nenhuma regra cadastrada ainda.</div>'}</div><div class="card list-card"><div class="section-title"><div><h2>Integração com Dashboard</h2><p>Consultores e produtos são lidos diretamente do Dashboard atual.</p></div></div><p><b>${consultants().length}</b> consultores ativos encontrados.</p><p><b>${products().length}</b> produtos/torres encontrados.</p><p style="color:var(--muted);line-height:1.6">Assim, quando você alterar consultores, equipes ou produtos no Dashboard, o Sistema BKO passa a enxergar a mesma estrutura.</p></div></div>`)}
