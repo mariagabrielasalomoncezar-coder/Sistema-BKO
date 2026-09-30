@@ -179,7 +179,6 @@ async function deleteOrder(id){
       await unsyncDashboardOrder(id,o);
     }
     await api(`/rest/v1/bko_orders?id=eq.${id}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});
-    if(editingOrderId===id)editingOrderId=null;
     clearDraft();
     await loadAll();
     currentView='pedidos';

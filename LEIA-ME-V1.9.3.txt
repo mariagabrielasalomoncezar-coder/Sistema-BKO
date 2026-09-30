@@ -1,0 +1,9 @@
+SISTEMA BKO VIVA CONECTA — V1.9.3
+
+CORREÇÃO
+- Corrigido erro ao excluir pedido: "Can't find variable: editingOrderId".
+- Agora, ao excluir um pedido que já foi enviado ao Dashboard, o sistema retira a produção do Dashboard e conclui a exclusão do pedido no BKO.
+- O cadastro do cliente continua preservado.
+
+OBSERVAÇÃO
+- Não altera as demais funções do sistema.
