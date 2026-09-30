@@ -1,0 +1,22 @@
+SISTEMA BKO VIVA CONECTA — V1.9.5
+
+ALTERAÇÕES DESTA VERSÃO
+
+1. CONSULTA DE CNPJ MAIS RESILIENTE
+- Mantida a BrasilAPI como fonte principal.
+- Adicionada tentativa alternativa da BrasilAPI.
+- Adicionada Minha Receita como fonte de contingência.
+- A consulta passa automaticamente para a próxima fonte quando uma delas falha ou demora.
+- Consulta de CEP também ganhou fontes alternativas (BrasilAPI e ViaCEP).
+- O formulário continua permitindo preenchimento manual se todas as fontes externas estiverem indisponíveis.
+
+2. EXPORTAÇÃO DETALHADA POR PRODUTO
+- O relatório "Exportar detalhado" agora gera UMA LINHA PARA CADA PRODUTO adicionado dentro do pedido.
+- Os dados do pedido/cliente (CNPJ, razão social, consultor, número do pedido etc.) são repetidos em cada linha.
+- Os campos comerciais de cada linha (Produto, Sub Produto, Sub Item, Débito Automático, Quality, Vencimento, Tipo de Cliente, Delta, Outro, Quantidade, Valor Unitário, Valor Contrato e Produto Dashboard) vêm do produto correspondente.
+- Foi adicionada a coluna "Item do Pedido" para identificar Produto 1, Produto 2, Produto 3 etc.
+- As abas de resumo "Por Consultor" e "Por Status" foram mantidas.
+
+IMPORTANTE
+- Não é necessário executar SQL novo para estas duas alterações.
+- Suba os arquivos normalmente no GitHub/Vercel.
