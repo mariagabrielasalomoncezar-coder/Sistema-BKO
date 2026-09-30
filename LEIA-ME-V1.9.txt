@@ -1,0 +1,55 @@
+VIVA CONECTA • SISTEMA BKO v1.9
+
+ATUALIZAÇÃO
+1. Rode primeiro o arquivo BKO-UPGRADE-v1.9.sql no SQL Editor do mesmo Supabase do BKO.
+2. Depois publique esta pasta na Vercel, mantendo o config.js com o mesmo Supabase já utilizado.
+
+ALTERAÇÕES DESTA VERSÃO
+- Consulta de CNPJ passa a tentar preencher também o campo Representante a partir do QSA retornado pela BrasilAPI. O campo continua editável para conferência/correção.
+- Novo campo BKO responsável ao lado de Equipe automática:
+  • Guilherme Chagas
+  • Guilherme Aparecido
+- Produto Tronco:
+  • movel
+  • ti
+  • APARELHO
+  • APARELHOS
+  • AVANÇADA
+  • AVANÇADO
+  • AVANÇADOS
+  • BANDA LARGA
+  • BANDALARGA
+- Sub Produto:
+  • alta
+  • link dedicado
+  • MIGRAÇÃO
+  • MIGRAÇÃO LINA/VN
+  • MIGRAÇÃOLINA/VN
+  • PF/PJ
+  • PORTABILIDADE
+  • SIP
+  • UPGRADE
+- Sub Item:
+  • MDM
+  • Pacote dados
+  • Travel
+  • 1GB
+  • 3GB
+  • 6GB
+  • 10GB
+  • 15GB
+  • 20GB
+  • 25GB
+  • 30GB
+  • 40GB
+  • 50GB
+  • 60GB
+  • 80GB
+  • 100GB
+  • 400MBPS
+  • 500MBPS
+  • 600MBPS
+  • 700MBPS
+- Status de entrega: adicionada opção F1 GANHA.
+- Pedidos antigos continuam compatíveis. Opções antigas não aparecem em pedidos novos, mas permanecem visíveis se já estiverem salvas em um pedido antigo.
+- A regra de envio para o Dashboard continua igual: somente APROVADO + CONCLUÍDO.

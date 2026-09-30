@@ -1,0 +1,17 @@
+VIVA CONECTA • SISTEMA BKO v1.9.1
+
+ALTERAÇÃO PRINCIPAL
+- O envio para o Dashboard não depende mais do Status do Pedido nem do Status de Entrega.
+- No final do cadastro/edição do pedido existe a opção:
+  SUBIR PARA DASHBOARD?  SIM / NÃO
+- SIM: envia/atualiza a produção no Dashboard ao salvar.
+- NÃO: não envia. Se o pedido já estava no Dashboard e for alterado para NÃO, ele é retirado do Dashboard.
+- A regra de Migração permanece: quando enviar ao Dashboard, contabiliza somente o Delta.
+
+ANTES DE PUBLICAR
+1. Abra o Supabase > SQL Editor.
+2. Execute BKO-UPGRADE-v1.9.sql caso ainda não tenha executado.
+3. Execute BKO-UPGRADE-v1.9.1.sql.
+4. Publique esta versão na Vercel.
+
+As demais funções da v1.9 foram mantidas.
