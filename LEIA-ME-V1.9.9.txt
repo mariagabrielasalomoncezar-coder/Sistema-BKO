@@ -1,0 +1,6 @@
+V1.9.9
+
+- Consulta de CNPJ mantida via Supabase.
+- Representante agora é normalizado no servidor e também possui leitura ampliada no navegador.
+- Compatível com QSA em array, objeto ou JSON textual e com múltiplos nomes de campos das fontes públicas.
+- Mantidas todas as alterações anteriores, inclusive planilha detalhada com uma linha por produto.

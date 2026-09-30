@@ -228,9 +228,10 @@ async function lookupCnpj(){
       const result=await fetchCnpjData(c);
       const b=result.data;
       source=result.source;
-      const qsa=Array.isArray(b.qsa)?b.qsa:(Array.isArray(b.socios)?b.socios:[]);
+      const arrayish=v=>{if(Array.isArray(v))return v;if(typeof v==='string'){try{const p=JSON.parse(v);if(Array.isArray(p))return p}catch{}}if(v&&typeof v==='object')return Object.values(v);return[]};
+      const qsa=[b.qsa,b.socios,b.quadro_societario,b.quadroSocietario,b.partners,b.administradores,b.administrators,b.empresa?.qsa,b.company?.qsa].flatMap(arrayish).filter(x=>x&&typeof x==='object');
       const repLegal=qsa.find(x=>firstText(x.nome_representante_legal,x.representante_legal));
-      const repSocio=qsa.find(x=>/administrador|titular|presidente|diretor|sócio-administrador|socio-administrador|sócio administrador|socio administrador/i.test(String(firstText(x.qualificacao_socio,x.qual,x.qualificacao,x.cargo))))||qsa[0]||{};
+      const repSocio=qsa.find(x=>/administrador|titular|presidente|diretor|gerente|respons[aá]vel|representante|s[oó]cio.?administrador/i.test(String(firstText(x.qualificacao_socio,x.qual,x.qualificacao,x.cargo,x.descricao_qualificacao,x.role,x.funcao))))||qsa[0]||{};
       let logradouro=firstText(b.logradouro,b.street,b.endereco);
       let bairro=firstText(b.bairro,b.neighborhood);
       let cidadeCnpj=firstText(b.municipio,b.cidade,b.city,b.localidade);
@@ -243,7 +244,7 @@ async function lookupCnpj(){
       const tipoLogradouro=firstText(b.descricao_tipo_de_logradouro,b.tipo_logradouro);
       const streetComplete=[tipoLogradouro,logradouro].filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
       const endereco=joinAddress([streetComplete,firstText(b.numero),firstText(b.complemento)]);
-      const representante=firstText(repLegal?.nome_representante_legal,repLegal?.representante_legal,repLegal?.nome,repSocio?.nome_representante_legal,repSocio?.nome_socio,repSocio?.nome,b.nome_representante_legal,b.representante_legal);
+      const representante=firstText(b.representante_normalizado,b.nome_representante_legal,b.representante_legal,b.representante,b.responsavel,repLegal?.nome_representante_legal,repLegal?.representante_legal,repLegal?.nome_socio,repLegal?.nome,repLegal?.name,repSocio?.nome_representante_legal,repSocio?.representante_legal,repSocio?.nome_socio,repSocio?.nome,repSocio?.name);
       d={
         razao_social:firstText(b.razao_social,b.nome_empresarial,b.nome),
         nome_fantasia:firstText(b.nome_fantasia,b.fantasia),
