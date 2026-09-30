@@ -1,0 +1,14 @@
+SISTEMA BKO VIVA CONECTA — V1.9.2
+
+Atualização baseada diretamente na v1.9.1 enviada pela usuária.
+
+ALTERAÇÃO DESTA VERSÃO
+- Adicionado botão "Excluir" na lista de Pedidos.
+- Adicionado botão "Excluir pedido" na tela de edição.
+- A exclusão exige confirmação.
+- Se o pedido já estiver sincronizado com o Dashboard, o lançamento é retirado do Dashboard antes da exclusão.
+- O cadastro do cliente não é apagado; somente o pedido é excluído.
+- Não requer novo SQL no Supabase.
+
+IMPORTANTE
+- Mantidas todas as funcionalidades e alterações da v1.9.1.
