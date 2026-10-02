@@ -1,0 +1,18 @@
+VIVA CONECTA - SISTEMA BKO v1.10
+
+Alterações desta versão:
+1. Cada produto passou a ser identificado visualmente como Pedido 1, Pedido 2, Pedido 3...
+2. Cada Pedido/Produto possui sua própria opção "Adicionar ao Dashboard? SIM / NÃO".
+3. Ao salvar, somente os itens marcados como SIM são enviados ao Dashboard Viva.
+4. Ao editar um pedido já enviado, o Dashboard é recalculado para refletir exatamente os itens atualmente marcados como SIM.
+5. Relatório detalhado mostra o SIM/NÃO individual de cada item.
+6. Botões "Duplicar para todos os pedidos" adicionados em:
+   - Dados do cliente
+   - Dados do pedido
+   - Entrega / andamento
+   - Finalização
+7. As cópias dessas etapas ficam salvas dentro de itens_comerciais, sem necessidade de criar novas colunas ou rodar SQL adicional.
+
+Banco/Supabase:
+- NÃO é necessário executar SQL novo para esta versão.
+- A estrutura existente da v1.9.9 continua compatível.
