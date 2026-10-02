@@ -1,0 +1,10 @@
+V1.12.2 — Adição independente por etapa
+
+- "+ Adicionar Produto" adiciona somente um novo produto em Informações Comerciais.
+- Dados do Cliente, Dados do Pedido, Entrega e Finalização só ganham um novo bloco ao clicar no botão da própria etapa.
+- Tudo permanece na mesma página.
+- O novo bloco de uma etapa é vinculado ao próximo produto que ainda não possui aquela etapa.
+- Se todos os produtos já tiverem a etapa, o sistema pede para adicionar outro produto primeiro.
+- Mantido o SIM/NÃO individual para envio ao Dashboard.
+- Mantidas as opções de Produto/Tronco: MÓVEL, TI, APARELHO, AVANÇADO e BANDA LARGA.
+- Não requer SQL novo no Supabase.
