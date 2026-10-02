@@ -4,7 +4,7 @@ const AUTH='vivaBkoAuthV1';
 let session=null, dashboardState=null, orders=[], clients=[], rules=[];
 let currentView='dashboard', tvTimer=null, tvZoom=1;
 let currentCnpjData=null, commercialItemSeq=0, reportTab='all', pendingDeliveryFilter='';
-const PRODUCT_SEED=['movel','ti','APARELHO','APARELHOS','AVANÇADA','AVANÇADO','AVANÇADOS','BANDA LARGA','BANDALARGA'];
+const PRODUCT_SEED=['MÓVEL','TI','APARELHO','AVANÇADO','BANDA LARGA'];
 const SUBPRODUCT_SEED=['alta','link dedicado','MIGRAÇÃO','MIGRAÇÃO LINA/VN','MIGRAÇÃOLINA/VN','PF/PJ','PORTABILIDADE','SIP','UPGRADE'];
 const SUBITEM_SEED=['MDM','Pacote dados','Travel','1GB','3GB','6GB','10GB','15GB','20GB','25GB','30GB','40GB','50GB','60GB','80GB','100GB','400MBPS','500MBPS','600MBPS','700MBPS'];
 const BKO_RESPONSAVEIS=['Guilherme Chagas','Guilherme Aparecido'];

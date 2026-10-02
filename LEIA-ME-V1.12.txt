@@ -1,0 +1,12 @@
+Viva Conecta BKO v1.12
+
+Alteração desta versão:
+- O campo Produto/Tronco agora apresenta somente estas opções para novos pedidos:
+  • MÓVEL
+  • TI
+  • APARELHO
+  • AVANÇADO
+  • BANDA LARGA
+
+- Mantidas as demais funcionalidades da v1.11.
+- Não exige alteração no Supabase.
