@@ -27,3 +27,11 @@
 
 /* V1.9.1 • envio manual para Dashboard */
 .dashboard-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.dashboard-choice button{border:1px solid var(--line);background:#fff;border-radius:11px;padding:11px 14px;font-weight:850;cursor:pointer;color:#655c74}.dashboard-choice button.active{background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:0 0 0 3px #9d72ff22}.dashboard-choice button:hover{filter:brightness(.98)}
+
+/* v1.11 - múltiplos pedidos na mesma página */
+.stage-items{display:grid;gap:14px}
+.stage-item{border:1px solid var(--border,#e7e4ef);border-radius:16px;padding:16px;background:#fff}
+.stage-item-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.stage-item-head b{font-size:15px;color:#5f259f}
+.stage-item-head span{font-size:12px;color:#777}
+@media (max-width:760px){.commercial-section-head{align-items:flex-start;gap:10px;flex-direction:column}.commercial-section-head .btn{width:100%}}

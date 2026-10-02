@@ -1,0 +1,13 @@
+SISTEMA BKO VIVA CONECTA — V1.11
+
+Alteração principal:
+- Múltiplos pedidos no mesmo cadastro e na mesma página.
+- Cada etapa tem botão "+ Adicionar Pedido".
+- Ao adicionar, o novo Pedido aparece automaticamente em todas as etapas:
+  Dados do Cliente, Informações Comerciais, Dados do Pedido, Entrega/Andamento e Finalização.
+- Cada Pedido possui campos independentes.
+- Cada Pedido possui "Adicionar ao Dashboard? SIM / NÃO" individual.
+- Remover pedido remove o mesmo número de todas as etapas.
+- Exportação detalhada usa os dados específicos de cada Pedido.
+- Mantida compatibilidade com registros antigos; o Pedido 1 usa os campos antigos como fallback.
+- Não exige SQL novo no Supabase.
