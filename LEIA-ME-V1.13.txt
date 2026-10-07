@@ -1,0 +1,16 @@
+Viva Conecta • Sistema BKO v1.13
+
+ALTERAÇÕES
+- O mesmo CNPJ pode ser usado em vários pedidos sem erro de chave duplicada. A base de clientes reutiliza/atualiza o cadastro do CNPJ.
+- Nova área Cadastros para adicionar/remover consultores usados no BKO.
+- Clara incluída na lista inicial de consultores.
+- Nova área para adicionar/remover responsáveis BKO.
+- Alexa incluída na lista inicial de responsáveis BKO.
+- Resumo por consultor mostra Total e Aparelhos separadamente.
+- Integração com o Dashboard respeita a opção "Contabilizar para consultor" de cada produto.
+- Aparelhos ficam como NÃO por padrão quando a configuração ainda não existir; pode ser alterado no Dashboard.
+
+IMPORTANTE
+- Esta versão não contém reset de pedidos, clientes ou histórico.
+- Não é necessário executar SQL para permitir repetição de CNPJ em pedidos.
+- Não execute os arquivos antigos de SETUP/UPGRADE apenas por causa desta atualização.
