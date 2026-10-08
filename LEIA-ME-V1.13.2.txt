@@ -1,0 +1,17 @@
+Viva Conecta • Sistema BKO v1.13.2
+
+ALTERAÇÃO DESTA VERSÃO
+- Cada produto/pedido pode enviar até 2 produtos para o Dashboard.
+- Produto 1 no Dashboard: produto principal.
+- Produto 2 no Dashboard: opcional, pensado para casos como Renovação + Delta Renovações.
+- Quando o Produto 2 for Delta Renovações, o valor enviado para essa torre é o campo Delta.
+- O segundo produto atualiza a torre/produto sem duplicar o valor geral da empresa nem o total do consultor.
+- Pedidos antigos continuam compatíveis e não são alterados automaticamente.
+
+EXEMPLO
+Renovação com delta:
+Produto 1 no Dashboard = Renovação Móvel
+Produto 2 no Dashboard = Delta Renovações
+Adicionar ao Dashboard? = SIM
+
+Não é necessário executar SQL para esta atualização.
