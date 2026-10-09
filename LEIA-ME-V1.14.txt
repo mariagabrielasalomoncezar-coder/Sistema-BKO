@@ -1,0 +1,18 @@
+SISTEMA BKO VIVA CONECTA — v1.14
+
+ALTERAÇÕES PRINCIPAIS
+- Área Cadastros ampliada: produtos, subprodutos, subitens/gigas, sistemas Vivo, status do pedido, status de entrega, tramitação, previsão e vencimentos podem ser adicionados/removidos sem nova versão do código.
+- 12GB incluído nos subitens.
+- Padronização: ALTA, LINK DEDICADO e MIGRAÇÃO LINA PARA VVN.
+- F1 GANHA disponível em Status do pedido.
+- Tramitação e Previsão em listas suspensas.
+- Campo de consultor identificado como Consultor da filial.
+- Campos obrigatórios: Tramitação, Responsável, E-mail, Telefone, BKO responsável, Vencimento, Sistema Vivo, Simulação e Status do pedido.
+- Quadro 3 reorganizado: cada Informações Comerciais – Pedido N fica seguido de Dados do Pedido N.
+- Botão Duplicar em cada pedido do Quadro 3.
+- Adicionar produto cria automaticamente o respectivo bloco de Dados do Pedido.
+- Pedidos já gravados não são apagados nem alterados por esta atualização.
+
+ATENÇÃO
+- Não é necessário executar SQL para esta versão.
+- As novas listas administrativas ficam salvas em bkoConfig dentro do viva_state já utilizado pelo sistema.

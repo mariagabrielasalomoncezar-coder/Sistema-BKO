@@ -35,3 +35,13 @@
 .stage-item-head b{font-size:15px;color:#5f259f}
 .stage-item-head span{font-size:12px;color:#777}
 @media (max-width:760px){.commercial-section-head{align-items:flex-start;gap:10px;flex-direction:column}.commercial-section-head .btn{width:100%}}
+
+/* v1.14 — pedidos agrupados e cadastros administráveis */
+.order-pairs{display:grid;gap:20px}
+.order-pair{border:2px solid #e5dcfb;border-radius:18px;background:#faf8ff;padding:14px}
+.order-pair .commercial-item{margin-top:0;border:0;background:transparent;padding:4px 4px 14px}
+.order-pair .paired-order-data{margin-top:10px;border:1px solid #ddd3f5;background:#fff}
+.commercial-item-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.catalog-row{grid-template-columns:1fr auto}
+.catalog-row .btn{justify-self:end}
+@media(max-width:620px){.order-pair{padding:10px}.commercial-item-actions{width:100%}.commercial-item-actions .btn{flex:1}.catalog-row{grid-template-columns:1fr auto}}
