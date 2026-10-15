@@ -1,0 +1,22 @@
+BKO V1.15 - atualização preparada em 15/10/2026
+
+ALTERAÇÕES:
+1. Tela Pedidos: nova coluna Data de Agendamento entre Instalação/Entrega e Dashboard.
+   A data já era armazenada no formulário de Entrega; não requer migração SQL.
+2. Indicadores operacionais em Dashboard BKO e Pedidos: Móvel Alta + Portabilidade,
+   Banda Larga e Móvel Renovação em tramitação. Somam QUANTIDADES dos itens,
+   não linhas/pedidos, excluindo status cancelado/reprovado/concluído e entregas concluídas.
+3. Relatório por produto e Excel: agrupamento pelos itens comerciais e suas quantidades,
+   em vez de usar apenas o produto principal do pedido. Exportação detalhada inclui
+   novas abas Por Produto e Conferencia, para comparar soma dos itens com as linhas.
+4. Exportação numérica aceita valores armazenados em formato decimal brasileiro.
+
+ATENÇÃO:
+- Nenhum pedido ou dado do Supabase foi alterado neste pacote.
+- A aba Conferencia confere o arquivo com o que está efetivamente salvo no BKO.
+  Para confrontar com o Dashboard Vivo real, exporte e compare os registros do banco.
+- A exportação detalhada já possuía Dt. Agendamento; agora também aparece na lista.
+- Teste a implantação em ambiente de homologação antes de substituir a versão ativa.
+- Se existirem pedidos legados salvos com quantidade incorreta em seus itens,
+  a correção exigirá identificar e corrigir esses registros, com conferência manual
+  dos pedidos originais. O sistema não inventa unidades não cadastradas.
